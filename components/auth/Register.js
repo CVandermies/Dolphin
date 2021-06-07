@@ -24,6 +24,12 @@ export default class Register extends Component {
         firebase.auth().createUserWithEmailAndPassword(email, password)
         //le then ci dessous va etre trigger quand on aura une réponse de firebase
             .then((result) => {
+                firebase.firestore().collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .set({
+                    name,
+                    email
+                })
                 console.log(result)
             })
             .catch((error) => {
