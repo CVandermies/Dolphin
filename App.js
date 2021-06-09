@@ -83,9 +83,14 @@ export class App extends Component {
       );    
     }    
 
+    //NavCont : container for the routes in React Native
     return(
       <Provider store = {store}>
-        <MainScreen/>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Main">
+              <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false}}/>
+          </Stack.Navigator>
+        </NavigationContainer>
       </Provider>      
     )
   }
