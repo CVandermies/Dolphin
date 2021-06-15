@@ -1,5 +1,5 @@
 import { USER_STATE_CHANGE } from '../constants/index'
-import * as firebase from 'firebase'
+import firebase from 'firebase'
 
 //appel à firestore, si on arrive a obtenir un snapshot le currentuser est màj et 
 //sera utilisé dans reducers/user
