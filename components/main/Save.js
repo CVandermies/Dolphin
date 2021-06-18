@@ -43,7 +43,23 @@ export default function Save(props) {
 
         task.on("state_changed", taskProgress, taskError, taskCompleted);
     }
-    
+
+    const savePostData = (downloadURL) => {
+
+        firebase.firestore()
+            .collection('posts')
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userPosts")
+            .add({
+                downloadURL,
+                caption,
+                likesCount: 0,
+                creation: firebase.firestore.FieldValue.serverTimestamp()
+            }).then((function () {
+                props.navigation.popToTop()
+            }))
+    }
+
     return (
         <View style={{ flex: 1 }}>
             <Image source={{ uri: props.route.params.image }} />
