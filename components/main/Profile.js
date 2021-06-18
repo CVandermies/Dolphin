@@ -8,6 +8,8 @@ import { connect } from 'react-redux'
 function Profile(props) {
     const [userPosts, setUserPosts] = useState([]);
     const [user, setUser] = useState(null);
+    const [following, setFollowing] = useState(false)
+
 
     useEffect(() => {
         const { currentUser, posts } = props;
@@ -48,39 +50,81 @@ function Profile(props) {
                 })
         }
 
-        //on met un array ici pour dire que useEffect ne fera qqchose que lorsque ces variables se màj
-    }, [props.route.params.uid])    
-
-        if (user === null) {
-            return <View />
+        //est ce que ce uid existe dans following ? :
+        if (props.following.indexOf(props.route.params.uid) > -1) {
+            setFollowing(true);
+        } else {
+            setFollowing(false);
         }
-        return (
-            <View style={styles.container}>
-                <View style={styles.containerInfo}>
-                    <Text>{user.name}</Text>
-                    <Text>{user.email}</Text>
-                </View>
 
-                <View style={styles.containerGallery}>
-                    <FlatList
-                        numColumns={3}
-                        horizontal={false}
-                        data={userPosts}
-                        renderItem={({ item }) => (
-                            <View
-                                style={styles.containerImage}>
-                                <Image
-                                    style={styles.image}
-                                    source={{ uri: item.downloadURL }}
-                                />
-                            </View>
+        //on met un array ici pour dire que useEffect ne fera qqchose que lorsque ces variables se màj
+    }, [props.route.params.uid, props.following])    
 
+    const onFollow = () => {
+        firebase.firestore()
+            .collection("following")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFollowing")
+            .doc(props.route.params.uid)
+            .set({})
+    }
+    const onUnfollow = () => {
+        firebase.firestore()
+            .collection("following")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFollowing")
+            .doc(props.route.params.uid)
+            .delete()
+    }
+
+    if (user === null) {
+        return <View />
+    }
+    return (
+        <View style={styles.container}>
+            <View style={styles.containerInfo}>
+                <Text>{user.name}</Text>
+                <Text>{user.email}</Text>
+
+                {props.route.params.uid !== firebase.auth().currentUser.uid ? (
+                <View>
+                    {following ? (
+                        <Button
+                            title="Unfollow"
+                            onPress={() => onUnfollow()}
+                        />
+                    ) :
+                        (
+                            <Button
+                                title="Follow"
+                                onPress={() => onFollow()}
+                            />
                         )}
-
-                    />
                 </View>
+            ) : null }
+
             </View>
-        )
+
+            <View style={styles.containerGallery}>
+                <FlatList
+                    numColumns={3}
+                    horizontal={false}
+                    data={userPosts}
+                    renderItem={({ item }) => (
+                        <View
+                            style={styles.containerImage}>
+                            <Image
+                                style={styles.image}
+                                source={{ uri: item.downloadURL }}
+                            />
+                        </View>
+
+                    )}
+
+                />
+            </View>
+        </View>
+    )
 }
 
 
@@ -110,5 +154,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
     posts: store.userState.posts,
+    following: store.userState.following
 })
 export default connect(mapStateToProps, null)(Profile);
