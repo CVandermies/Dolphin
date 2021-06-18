@@ -11,10 +11,32 @@ function Profile(props) {
         console.log({currentUser,posts})
     
         return (
-        <View>
-            <Text>{currentUser.name}</Text>
-        </View>
-    )
+            <View style={styles.container}>
+                <View style={styles.containerInfo}>
+                    <Text>{currentUser.name}</Text>
+                    <Text>{currentUser.email}</Text>
+                </View>
+
+                <View style={styles.containerGallery}>
+                    <FlatList
+                        numColumns={3}
+                        horizontal={false}
+                        data={posts}
+                        renderItem={({ item }) => (
+                            <View
+                                style={styles.containerImage}>
+                                <Image
+                                    style={styles.image}
+                                    source={{ uri: item.downloadURL }}
+                                />
+                            </View>
+
+                        )}
+
+                    />
+                </View>
+            </View>
+        )
 }
 
 
@@ -34,13 +56,15 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        aspectRatio: 1 / 1
+        width: 100,
+        height:100,
+        
+    aspectRatio: 1 / 1
     }
 })
 
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
     posts: store.userState.posts,
-    following: store.userState.following
 })
 export default connect(mapStateToProps, null)(Profile);
