@@ -3,6 +3,9 @@ import{ View, Text } from 'react-native'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon from 'react-native-vector-icons/FontAwesome';
+import firebase from 'firebase'
+
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -10,6 +13,7 @@ import { fetchUser, fetchUserPosts } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
+import SearchScreen from './main/Search'
 
 const Tab = createMaterialBottomTabNavigator();
 //const Tab = createMaterialBottomTabNavigator();
@@ -28,10 +32,19 @@ export class Main extends Component {
     render() {
         return (
             <Tab.Navigator initialRouteName="Feed" >
-                <Tab.Screen name="Feed" component={FeedScreen} 
+                <Tab.Screen 
+                name="Feed" 
+                component={FeedScreen} 
+                options={{
+                    tapBarIcon: ({ color }) => (
+                        <Icon name="home" color={color} size={26}/>
+                    ),
+                }}/>
+                
+                <Tab.Screen name="Search" component={SearchScreen} navigation={this.props.navigation}
                 options={{
                     tapBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="home" color={color} size={26}/>
+                        <MaterialCommunityIcons name="magnify" color={color} size={26}/>
                     ),
                 }}/>
                 <Tab.Screen name="Posting" component={EmptyScreen} 
@@ -47,6 +60,11 @@ export class Main extends Component {
                     ),
                 }}/>
                 <Tab.Screen name="Profile" component={ProfileScreen} 
+                    listeners={({ navigation }) => ({
+                        tabPress: event => {
+                            event.preventDefault();
+                            navigation.navigate("Profile", {uid: firebase.auth().currentUser.uid})
+                        }})}
                 options={{
                     tapBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="account-circle" color={color} size={26}/>
